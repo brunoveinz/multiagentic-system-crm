@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 // En producción servimos todo bajo un solo dominio: Next hace de proxy de /api/*
 // hacia el contenedor del backend (red interna de Docker). En dev no se usa
@@ -11,6 +12,15 @@ const nextConfig: NextConfig = {
     return [
       { source: "/api/:path*", destination: `${API_PROXY_TARGET}/api/:path*` },
     ];
+  },
+  // Alias explícito @ -> src para que `next build` lo resuelva sin depender
+  // de los paths del tsconfig (que en el build de prod fallaban).
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      "@": path.resolve(process.cwd(), "src"),
+    };
+    return config;
   },
 };
 
