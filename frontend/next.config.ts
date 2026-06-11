@@ -8,9 +8,12 @@ const API_PROXY_TARGET = process.env.API_PROXY_TARGET || "http://api:8000";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // No redirigir quitando la barra final, y re-agregarla en el destino del proxy:
+  // el backend (Django/DRF) exige rutas con `/` al final.
+  skipTrailingSlashRedirect: true,
   async rewrites() {
     return [
-      { source: "/api/:path*", destination: `${API_PROXY_TARGET}/api/:path*` },
+      { source: "/api/:path*", destination: `${API_PROXY_TARGET}/api/:path*/` },
     ];
   },
   // Alias explícito @ -> src para que `next build` lo resuelva sin depender
