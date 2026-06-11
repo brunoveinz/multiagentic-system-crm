@@ -1,0 +1,21 @@
+# Configuración de herramientas (lint, tipos, tests). Las dependencias de
+# runtime viven en requirements.txt y se instalan con uv en el Dockerfile.
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["migrations"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "DJ"]  # errores, pyflakes, imports, pyupgrade, bugbear, django
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+exclude = ["migrations"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.dev"
+python_files = ["test_*.py", "tests.py"]
+addopts = "-q"

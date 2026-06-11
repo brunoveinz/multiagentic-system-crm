@@ -1,0 +1,35 @@
+# Secrets / entorno
+.env
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Django
+*.sqlite3
+/backend/staticfiles/
+/backend/media/
+
+# Node / Next.js
+node_modules/
+/frontend/.next/
+/frontend/out/
+/frontend/.turbo/
+npm-debug.log*
+
+# Editores / SO
+.DS_Store
+.idea/
+.vscode/
+
+# Datos locales de contenedores (si se montan a host)
+/data/

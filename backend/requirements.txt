@@ -1,0 +1,27 @@
+# Dependencias del backend (instaladas con uv dentro de la imagen Docker).
+# Fase 0: solo lo necesario para levantar la web/API y Celery.
+# LangChain, OpenAI y Google se agregan en sus fases (4 y 5).
+
+Django>=5.1,<5.2
+djangorestframework>=3.15
+djangorestframework-simplejwt>=5.3
+django-cors-headers>=4.4
+psycopg[binary]>=3.2
+celery>=5.4
+redis>=5.0
+qdrant-client>=1.11
+gunicorn>=23.0
+whitenoise>=6.7
+
+# IA / RAG (Fase 4)
+langchain-core>=0.3
+langchain-openai>=0.2
+langchain-text-splitters>=0.3
+pydantic>=2.7
+
+# Gmail / OAuth (Fase 5)
+google-auth>=2.35
+google-auth-oauthlib>=1.2
+google-api-python-client>=2.140
+cryptography>=43
+requests>=2.32
