@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ApiError } from "@/lib/api";
+import { formatApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import {
   CenteredCard,
@@ -34,12 +34,13 @@ export default function SignupPage() {
       await signup(username, email, password);
       router.replace("/onboarding");
     } catch (err) {
-      if (err instanceof ApiError && err.data && typeof err.data === "object") {
-        const first = Object.values(err.data as Record<string, unknown>)[0];
-        setError(Array.isArray(first) ? String(first[0]) : "No se pudo crear la cuenta.");
-      } else {
-        setError("No se pudo crear la cuenta.");
-      }
+      setError(
+        formatApiError(err, "No se pudo crear la cuenta.", {
+          username: "Usuario",
+          email: "Email",
+          password: "Contraseña",
+        }),
+      );
     } finally {
       setSubmitting(false);
     }

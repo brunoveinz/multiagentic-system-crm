@@ -36,6 +36,39 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Convierte el cuerpo de error de DRF en un mensaje legible para el usuario.
+ * Soporta `{ detail: "..." }`, `{ campo: ["msg", ...], ... }` y strings sueltos.
+ * Aplana TODOS los campos (no solo el primero) e incluye el código de estado,
+ * para que el usuario nunca quede sin saber por qué falló la operación.
+ * `labels` opcional traduce el nombre del campo (p. ej. `username` -> `Usuario`).
+ */
+export function formatApiError(
+  err: unknown,
+  fallback: string,
+  labels: Record<string, string> = {},
+): string {
+  if (!(err instanceof ApiError)) return fallback;
+  const { data, status } = err;
+
+  if (typeof data === "string" && data.trim()) return data;
+
+  if (data && typeof data === "object") {
+    const obj = data as Record<string, unknown>;
+    if (typeof obj.detail === "string" && obj.detail.trim()) return obj.detail;
+
+    const parts: string[] = [];
+    for (const [field, value] of Object.entries(obj)) {
+      const msgs = (Array.isArray(value) ? value : [value]).map(String);
+      const label = field === "non_field_errors" ? "" : `${labels[field] ?? field}: `;
+      parts.push(`${label}${msgs.join(" ")}`);
+    }
+    if (parts.length) return parts.join(" · ");
+  }
+
+  return `${fallback} (error ${status})`;
+}
+
 async function rawFetch(path: string, init: RequestInit): Promise<Response> {
   return fetch(`${API_BASE}${path}`, {
     ...init,
