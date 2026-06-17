@@ -1,8 +1,8 @@
 # =========================================================================
 # Stack de PRODUCCIÓN (Dokploy). Un solo dominio público apunta al servicio
 # `web`; el resto vive en la red interna de Docker.
-#   - web    : Next.js (build + start), proxea /api -> api
-#   - api    : Django + DRF con gunicorn
+#   - web       : Next.js (build + start), proxea /api -> ventas-api
+#   - ventas-api: Django + DRF con gunicorn
 #   - worker : Celery (tareas async)
 #   - beat   : Celery beat (agendas: coach 08:00, seguimiento 09:00)
 #   - postgres / redis / qdrant : datos (con volúmenes persistentes)
@@ -41,7 +41,11 @@ services:
       - qdrant_data:/qdrant/storage
     restart: unless-stopped
 
-  api:
+  # Nombre ÚNICO a propósito: en Dokploy todos los stacks comparten la red
+  # `dokploy-network`, donde un alias genérico como `api` colisiona con el de
+  # otros proyectos (p. ej. el `api` uvicorn de `sellyagentic`). Con un nombre
+  # propio, `web` resuelve siempre ESTE backend.
+  ventas-api:
     build:
       context: ./backend
     command: >
@@ -127,11 +131,11 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.prod
     environment:
-      API_PROXY_TARGET: http://api:8000
+      API_PROXY_TARGET: http://ventas-api:8000
     ports:
       - "3000"
     depends_on:
-      - api
+      - ventas-api
     restart: unless-stopped
 
 volumes:
