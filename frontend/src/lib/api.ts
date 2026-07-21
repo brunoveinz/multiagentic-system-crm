@@ -4,6 +4,19 @@
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
+// Prefijo público de la API cuando servimos same-origin (prod: API_BASE === "").
+// No usamos /api porque en el proxy de Dokploy otra app tiene tomada esa ruta y
+// gana por ser más específica que nuestro `/`. Next reescribe /crm-api/* hacia
+// /api/* del backend, así que Django no cambia. En dev llamamos directo a Django,
+// que sí vive bajo /api, y por eso ahí el prefijo se deja intacto.
+const PUBLIC_API_PREFIX = "/crm-api";
+
+function publicPath(path: string): string {
+  return API_BASE === ""
+    ? path.replace(/^\/api(?=\/|$)/, PUBLIC_API_PREFIX)
+    : path;
+}
+
 const ACCESS_KEY = "ventas.access";
 const REFRESH_KEY = "ventas.refresh";
 
@@ -70,7 +83,7 @@ export function formatApiError(
 }
 
 async function rawFetch(path: string, init: RequestInit): Promise<Response> {
-  return fetch(`${API_BASE}${path}`, {
+  return fetch(`${API_BASE}${publicPath(path)}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
@@ -85,7 +98,7 @@ async function rawFetch(path: string, init: RequestInit): Promise<Response> {
 async function tryRefresh(): Promise<boolean> {
   const refresh = tokenStore.refresh;
   if (!refresh) return false;
-  const res = await fetch(`${API_BASE}/api/auth/token/refresh/`, {
+  const res = await fetch(`${API_BASE}${publicPath("/api/auth/token/refresh/")}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ refresh }),

@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
   skipTrailingSlashRedirect: true,
   async rewrites() {
     return [
+      // Prefijo público real (ver PUBLIC_API_PREFIX en src/lib/api.ts): /api está
+      // tomado por otra app en el proxy de Dokploy, así que exponemos /crm-api.
+      { source: "/crm-api/:path*", destination: `${API_PROXY_TARGET}/api/:path*/` },
       { source: "/api/:path*", destination: `${API_PROXY_TARGET}/api/:path*/` },
     ];
   },
