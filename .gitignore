@@ -33,3 +33,6 @@ npm-debug.log*
 
 # Datos locales de contenedores (si se montan a host)
 /data/
+
+# Celery beat: DB de agenda que se reescribe en runtime, no va al repo
+backend/celerybeat-schedule

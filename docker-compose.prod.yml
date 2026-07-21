@@ -130,8 +130,10 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
-    environment:
-      API_PROXY_TARGET: http://ventas-api:8000
+      # El destino del proxy /api se hornea en `next build`, así que va como
+      # build arg (no como `environment:`, que es runtime y no tiene efecto).
+      args:
+        API_PROXY_TARGET: http://ventas-api:8000
     ports:
       - "3000"
     depends_on:

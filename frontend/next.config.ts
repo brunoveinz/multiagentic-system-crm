@@ -4,7 +4,12 @@ import path from "path";
 // En producción servimos todo bajo un solo dominio: Next hace de proxy de /api/*
 // hacia el contenedor del backend (red interna de Docker). En dev no se usa
 // porque el front llama directo a NEXT_PUBLIC_API_BASE_URL.
-const API_PROXY_TARGET = process.env.API_PROXY_TARGET || "http://api:8000";
+// OJO: `rewrites()` se evalúa en `next build`, no en runtime — el destino queda
+// horneado en .next/routes-manifest.json. Por eso este valor tiene que llegar
+// como ARG de build (ver Dockerfile.prod); ponerlo solo en `environment:` del
+// compose no tiene ningún efecto. Y por eso el default apunta al nombre real del
+// servicio: un `api` genérico colisiona en la red compartida de Dokploy.
+const API_PROXY_TARGET = process.env.API_PROXY_TARGET || "http://ventas-api:8000";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,

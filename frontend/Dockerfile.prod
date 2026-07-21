@@ -8,6 +8,11 @@ WORKDIR /app
 ENV NEXT_PUBLIC_API_BASE_URL=""
 ENV NODE_ENV=production
 
+# El destino del proxy /api se hornea durante `next build`, así que tiene que
+# estar disponible ACÁ y no solo en el `environment:` del compose (runtime).
+ARG API_PROXY_TARGET=http://ventas-api:8000
+ENV API_PROXY_TARGET=$API_PROXY_TARGET
+
 COPY package.json ./
 RUN npm install
 
