@@ -178,6 +178,14 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 OPENAI_CHAT_MODEL = os.environ.get("OPENAI_CHAT_MODEL", "gpt-4o-mini")
 OPENAI_EMBEDDING_MODEL = os.environ.get("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
 
+# --- Prospección en mapa (OpenStreetMap, sin API key) ---
+# Nominatim geocodifica el lugar ("Providencia") a una bbox; Overpass busca los
+# negocios dentro de ella. Ambos servicios públicos piden un User-Agent propio y
+# limitan a ~1 req/s: para producción real conviene apuntar a instancias propias.
+NOMINATIM_URL = os.environ.get("NOMINATIM_URL", "https://nominatim.openstreetmap.org/search")
+OVERPASS_URL = os.environ.get("OVERPASS_URL", "https://overpass-api.de/api/interpreter")
+OSM_USER_AGENT = os.environ.get("OSM_USER_AGENT", "ventas-crm/1.0 (prospeccion)")
+
 # --- Google / Gmail OAuth (Fase 5) ---
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")

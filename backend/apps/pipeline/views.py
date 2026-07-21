@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from apps.agents.services import prospector
 from apps.common.viewsets import OrgScopedModelViewSet, OrgScopedReadOnlyViewSet
 
 from .models import Activity, Contact, Lead, Stage
@@ -15,8 +16,11 @@ from .serializers import (
     LeadCreateSerializer,
     LeadDetailSerializer,
     LeadUpdateSerializer,
+    ProspectImportSerializer,
+    ProspectSearchSerializer,
     StageSerializer,
 )
+from .services import prospecting
 
 
 class StageViewSet(OrgScopedReadOnlyViewSet):
@@ -76,6 +80,53 @@ class LeadViewSet(OrgScopedModelViewSet):
                 actor=request.user,
             )
         return Response(LeadCardSerializer(lead).data)
+
+    @action(detail=False, methods=["post"])
+    def prospect(self, request: Request) -> Response:
+        """
+        Prospección en el mapa: texto libre -> el agente lo estructura -> se
+        busca en OpenStreetMap. Devuelve candidatos (aún NO son leads).
+        """
+        serializer = ProspectSearchSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        query = prospector.interpret(serializer.validated_data["query"])
+        filters = [f.model_dump() for f in query.filters]
+        result = prospecting.search(query.location, filters)
+
+        # Nombres ya usados por leads de esta org: marcamos los candidatos que ya
+        # están en el pipeline para no duplicar a ojo desde el mapa.
+        existing = set(
+            Lead.objects.filter(organization=request.user.organization)
+            .values_list("name", flat=True)
+        )
+        candidates = []
+        for c in result.candidates:
+            item = c.to_dict()
+            item["already_lead"] = c.name in existing
+            candidates.append(item)
+
+        return Response(
+            {
+                "label": query.label,
+                "location": query.location,
+                "center": result.center,
+                "bbox": result.bbox,
+                "candidates": candidates,
+            }
+        )
+
+    @action(detail=False, methods=["post"])
+    def import_prospect(self, request: Request) -> Response:
+        """Convierte un candidato del mapa en un Lead del pipeline."""
+        serializer = ProspectImportSerializer(
+            data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+        lead = serializer.save()
+        return Response(
+            LeadCardSerializer(lead).data, status=status.HTTP_201_CREATED
+        )
 
     @action(detail=True, methods=["post"])
     def note(self, request: Request, pk: str | None = None) -> Response:

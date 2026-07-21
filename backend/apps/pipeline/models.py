@@ -36,10 +36,19 @@ class Lead(OrganizationScoped):
     """Una empresa/persona a la que se le quiere vender. Carga manual en v1."""
 
     SOURCE_MANUAL = "manual"
-    SOURCE_CHOICES = [(SOURCE_MANUAL, "Carga manual")]
+    SOURCE_MAPS = "maps"
+    SOURCE_CHOICES = [
+        (SOURCE_MANUAL, "Carga manual"),
+        (SOURCE_MAPS, "Prospección en mapa"),
+    ]
 
     name = models.CharField(max_length=200, help_text="Empresa o persona.")
     company = models.CharField(max_length=200, blank=True)
+    # Geo opcional: se rellena cuando el lead entra por prospección en el mapa
+    # (OpenStreetMap). Sirve para volver a ubicarlo y para futuras vistas geo.
+    address = models.CharField(max_length=300, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
     stage = models.ForeignKey(
         Stage,
         on_delete=models.PROTECT,

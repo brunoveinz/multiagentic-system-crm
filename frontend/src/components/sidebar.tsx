@@ -5,16 +5,24 @@ import {
   BookOpen,
   KanbanSquare,
   LogOut,
+  MapPinned,
   MessageCircleHeart,
   Settings,
   Zap,
   type LucideIcon,
 } from "lucide-react";
 
-export type AppView = "board" | "metrics" | "coach" | "knowledge" | "config";
+export type AppView =
+  | "board"
+  | "prospect"
+  | "metrics"
+  | "coach"
+  | "knowledge"
+  | "config";
 
 const ITEMS: { key: AppView; label: string; Icon: LucideIcon }[] = [
   { key: "board", label: "Tablero", Icon: KanbanSquare },
+  { key: "prospect", label: "Prospección", Icon: MapPinned },
   { key: "metrics", label: "Métricas", Icon: BarChart3 },
   { key: "coach", label: "Coach", Icon: MessageCircleHeart },
   { key: "knowledge", label: "Conocimiento", Icon: BookOpen },

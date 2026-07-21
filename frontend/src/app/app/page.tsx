@@ -19,10 +19,12 @@ import { MetricsView } from "@/components/metricsView";
 import { ConfigView } from "@/components/configView";
 import { KnowledgeView } from "@/components/knowledgeView";
 import { CoachView } from "@/components/coachView";
+import { ProspectView } from "@/components/prospectView";
 import { FloatingChat } from "@/components/floatingChat";
 
 const VIEW_TITLE: Record<AppView, string> = {
   board: "Tablero",
+  prospect: "Prospección",
   metrics: "Métricas",
   coach: "Coach",
   knowledge: "Conocimiento",
@@ -151,6 +153,7 @@ export default function AppHome() {
             {view === "board" && (
               <Board board={board} onCardClick={setSelectedLead} onMove={handleMove} />
             )}
+            {view === "prospect" && <ProspectView />}
             {view === "metrics" && (
               <MetricsView northMetric={org.default_north_metric} />
             )}
